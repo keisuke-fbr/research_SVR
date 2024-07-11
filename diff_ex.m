@@ -1,4 +1,4 @@
-num = [50];
+num = [100,500,1000];
 
 
 for num_i = num
@@ -14,15 +14,15 @@ for num_i = num
 
     % SVR用に入力データを整える(入力引数としてエラーが出ないように)
     X = reshape(X, num_i, 1);
-    Y_orignal = reshape(Y_original, num_i, 1);
+    Y_original = reshape(Y_original, num_i, 1);
     Y_observation = reshape(Y_observation, num_i, 1);
 
     
     % SVRのハイパーパラメータの候補
-    %epsilon_L1 = [0, 0.2, 0.4, 0.6, 0.8, 1.0]; 
-    %epsilon_L2 = [0, 0,2, 0.4, 0.6, 0.8, 1.0];
-    epsilon_L1 = [0]; 
-    epsilon_L2 = [0];
+    epsilon_L1 = [0, 0.2, 0.4, 0.6, 0.8, 1.0]; 
+    epsilon_L2 = [0, 0,2, 0.4, 0.6, 0.8, 1.0];
+    % epsilon_L1 = [0]; 
+    % epsilon_L2 = [0];
     C_L1 = [0.1, 1, 10, 50];
     C_L2 = [0.1, 1, 10, 50];
     KernelScale = [10, 1, 0.1]; % Pythonにおけるgammaの役割を果たすパラメータ. gamma=1/(KernelScale^2)の関係.
@@ -62,8 +62,8 @@ for num_i = num
     rng('default'); % 乱数を固定しないと, データの分割が等しくなくなる
     cv1 = cvpartition(num_i, 'KFold', 5); % まず, データを学習データとテストデータに分ける(10分割. つまり9:1)
     
-    y_learned_L1 = zeros(1,num_i);
-    y_learned_L2 = zeros(1,num_i);
+    y_learned_L1 = zeros(num_i,1);
+    y_learned_L2 = zeros(num_i,1);
 
         
     
@@ -213,11 +213,11 @@ for num_i = num
     disp("真値との最大絶対値誤差");
     disp(max(abs(Y_original-y_learned_L1)))
 
-    disp("ハイパーパラメータの出力:ε:" + string(epsilon_L1_data));
-    disp("ハイパーパラメータの出力:C:" + string(C_L1_data));
-    disp("ハイパーパラメータの出力:k:" + string(KernelScale_L1_data));
+    disp("出力:ε:" + string(epsilon_L1_data));
+    disp("出力:C:" + string(C_L1_data));
+    disp("出力:k:" + string(KernelScale_L1_data));
 
-    disp("サポートベクターの割合:" + string(ratio_SV_L1));
+    disp("svの割合:" + string(ratio_SV_L1));
 
 
     % プロットの作成
@@ -234,7 +234,7 @@ for num_i = num
     plot(X, y_learned_L1 + mean(epsilon_L1_data), 'r--', 'LineWidth',0.5);
     plot(X, y_learned_L1 - mean(epsilon_L1_data), 'r--', 'LineWidth',0.5);
     % プロットの装飾
-    title('L1:元関数, 観測値, 予測値のグラフ');
+    title('L1:元関数, 観測値, 予測値のグラフ、データ数：'+string(num_i));
     xlabel('X');
     ylabel('Y');
     legend({'元関数', '観測値', '予測値', 'ε帯'}, 'Location', 'Best');
@@ -250,11 +250,11 @@ for num_i = num
     disp("真値との最大絶対値誤差");
     disp(max(abs(Y_original-y_learned_L2)))
 
-    disp("ハイパーパラメータの出力:ε:" + string(epsilon_L2_data));
-    disp("ハイパーパラメータの出力:C:" + string(C_L2_data));
-    disp("ハイパーパラメータの出力:k:" + string(KernelScale_L2_data));
+    disp("出力:ε:" + string(epsilon_L2_data));
+    disp("出力:C:" + string(C_L2_data));
+    disp("出力:k:" + string(KernelScale_L2_data));
 
-    disp("サポートベクターの割合:" + string(ratio_SV_L2));
+    disp("svの割合:" + string(ratio_SV_L2));
 
 
     % プロットの作成
@@ -271,7 +271,7 @@ for num_i = num
     plot(X, y_learned_L2 + mean(epsilon_L2_data), 'r--', 'LineWidth',0.5);
     plot(X, y_learned_L2 - mean(epsilon_L2_data), 'r--', 'LineWidth',0.5);
     % プロットの装飾
-    title('L2:元関数, 観測値, 予測値のグラフ');
+    title('L2:元関数, 観測値, 予測値のグラフ、データ数：'+string(num_i));
     xlabel('X');
     ylabel('Y');
     legend({'元関数', '観測値', '予測値', 'ε帯'}, 'Location', 'Best');

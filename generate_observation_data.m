@@ -4,8 +4,8 @@ function y_noisy = generate_observation_data(x)
     
     % ホワイトノイズの追加
     num_points = length(x);
-    noise1 = randn(1, num_points) * 10;  % 標準偏差10のホワイトノイズ
-    noise2 = randn(1, num_points) * 50;  % 標準偏差50のホワイトノイズ
+    noise1 = randn(1, num_points) * 5;  % 標準偏差10のホワイトノイズ
+    noise2 = randn(1, num_points) * 80;  % 標準偏差50のホワイトノイズ
 
     % 90%のデータに標準偏差10のホワイトノイズを適用
     noise = noise1;
