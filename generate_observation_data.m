@@ -11,7 +11,7 @@ function y_noisy = generate_observation_data(x)
     noise = noise1;
 
     % 10%のデータに標準偏差50のホワイトノイズを適用
-    num_high_noise_points = round(0.1 * num_points);
+    num_high_noise_points = round(0.4 * num_points);
     high_noise_indices = randperm(num_points, num_high_noise_points);
     noise(high_noise_indices) = noise2(high_noise_indices);
 
