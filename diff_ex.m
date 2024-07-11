@@ -1,4 +1,4 @@
-num = [50];
+num = [100,1000];
 
 
 for num_i = num
@@ -69,8 +69,8 @@ for num_i = num
     rng('default'); % 乱数を固定しないと, データの分割が等しくなくなる
     cv1 = cvpartition(num_i, 'KFold', 5); % まず, データを学習データとテストデータに分ける(10分割. つまり9:1)
     
-    y_learned_L1 = zeros(1,num_i);
-    y_learned_L2 = zeros(1,num_i);
+    y_learned_L1 = zeros(num_i,1);
+    y_learned_L2 = zeros(num_i,1);
 
         
     
