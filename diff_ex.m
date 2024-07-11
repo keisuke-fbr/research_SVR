@@ -5,18 +5,11 @@ for num_i = num
     rng default;
 
     %Xデータ作成
-    % 90%のデータを0から30の範囲で生成
-    num_0_30 = round(0.9 * num_i);
-    x_0_30 = 30 * rand(num_0_30, 1);
-    % 10%のデータを30から100の範囲で生成
-    num_30_100 = num_i - num_0_30;
-    x_30_100 = 30 + (100 - 30) * rand(num_30_100, 1);
-    % すべてのデータを結合
-    X = [x_0_30; x_30_100];
+    X = linspace(0, 100, num_i);  % xの範囲は0から100
     X = sort(X);
 
     %元データとノイズを乗せた観測データの作成
-    Y_original = generate_original_data(X);
+    Y_original = sin(X);
     Y_observation = generate_observation_data(X);
 
     % SVR用に入力データを整える(入力引数としてエラーが出ないように)

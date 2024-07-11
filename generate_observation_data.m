@@ -1,12 +1,20 @@
 function y_noisy = generate_observation_data(x)
-    % Define y values based on x ranges with even shorter periods (doubling the frequency again)
-    y = zeros(size(x));
-    y(x <= 30) = 15 + 15 * sin(8 * pi * x(x <= 30) / 30);  % Even shorter period for 0-30 range
-    y(x > 30) = 90 + 10 * sin(8 * pi * (x(x > 30) - 30) / 70);  % Even shorter period for 30-100 range
+    % 基本となる周期関数（-10から10の範囲）
+    y_base = 10 * sin(x);
+    
+    % ホワイトノイズの追加
+    num_points = length(x);
+    noise1 = randn(1, num_points) * 10;  % 標準偏差10のホワイトノイズ
+    noise2 = randn(1, num_points) * 50;  % 標準偏差50のホワイトノイズ
 
-    % Generate noise with mean 0 and standard deviation 10
-    noise = 10 * randn(size(x));
+    % 90%のデータに標準偏差10のホワイトノイズを適用
+    noise = noise1;
 
-    % Add noise to the y values
-    y_noisy = y + noise;
+    % 10%のデータに標準偏差50のホワイトノイズを適用
+    num_high_noise_points = round(0.1 * num_points);
+    high_noise_indices = randperm(num_points, num_high_noise_points);
+    noise(high_noise_indices) = noise2(high_noise_indices);
+
+    % yにノイズを追加
+    y_noisy = y_base + noise;
 end
