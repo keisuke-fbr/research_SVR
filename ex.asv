@@ -4,19 +4,19 @@ num = [1030];
 for num_i = num
     rng default;
 
-    data = readmatrix('Concrete.csv'); % コンクリートに関するデータ(1030個)
-    X = [data(:, 1) data(:, 4), data(:, 6), data(:, 7)]; % セメントの量, 水の量, 粗骨材の量, 細骨材の量
+    data = readmatrix('Concrete_Data.xls'); % コンクリートに関するデータ(1030個)
+    X = [data(:, 1),data(:,4)] ; % セメントの量, 水の量, 粗骨材の量, 細骨材の量
     Y = data(:, 9); % コンクリートの強度
 
-
-
-
-   
-    
     % SVRのハイパーパラメータの候補(色々試してこれ)
     epsilon = [0, 1, 2, 3, 4, 5];
+    epsilon = [4, 5];
+    
     C = [0.1, 1, 10, 100];
+    C = [0.1, 1];
+    
     KernelScale = [30, 20, 10, sqrt(10), 1, 1/sqrt(10), 0.1];
+    KernelScale = [30,1, 0.1];
     
     %最適パラメータ保持用
     epsilon_L1_data = zeros(1,5);
@@ -67,8 +67,8 @@ for num_i = num
         ME_flag = 0; % 最適化プログラムが収束しなかったら1.
     
         % 内側の交差検証でグリッドサーチ
-        for e = epsilon_L1
-            for c = C_L1
+        for e = epsilon
+            for c = C
                 for k = KernelScale
                     absolute_error_L1 = 0;
                     for j = 1:5 % 内側の交差検証で数えて, j番目の組み合わせ(5個)
@@ -78,8 +78,8 @@ for num_i = num
                         % 訓練データを使って, 回帰モデル作成
                         try
                             disp("モデル作成開始L1:ハイパーパラメータ：ε="+string(e)+",C="+string(c)+",kernel="+string(k)+",内部"+string(j)+"回目、外部"+string(i)+"回目");
-                            mdl_L1SVR_Tuning = fitrsvm(X(train_idx, :), Y(train_idx), "BoxConstraint", c, "KernelFunction", "rbf", "KernelScale", k, "Epsilon", e);
-                            disp("モデル作成終了")
+                            mdl_L1SVR_Tuning = fitrsvm(X(train_idx,:), Y(train_idx), "BoxConstraint", c, "KernelFunction", "rbf", "KernelScale", k, "Epsilon", e);
+                            % disp("モデル作成終了")
                         catch ME
                             ME_flag = 1; % もし最適化プログラムが収束しなかった場合はME_flag=1にして, break
                             break;
@@ -121,7 +121,7 @@ for num_i = num
         C_L1_data(i) = C_L1_opt;
         KernelScale_L1_data(i) = KernelScale_L1_opt;
 
-        ratio_SV_L1(i) = size(mdl_L1SVR.SupportVectors,1)/(size(X(learn_idx),1));
+        ratio_SV_L1(i) = size(mdl_L1SVR.SupportVectors,1)/(size(X(learn_idx,:),1));
     end
     
 
@@ -215,10 +215,10 @@ for num_i = num
     figure;
 
     % Y_originalのプロット
-    plot(X, Y, 'o-', 'LineWidth', 1.5); 
+    scatter3(X(1),X(2),Y,"fiilled");
     hold on; 
     % y_pred_L1のプロット
-    plot(X, y_learned_L1, 'g-', 'LineWidth', 1.5);
+    surf
     %ε帯の描写
     plot(X, y_learned_L1 + mean(epsilon_L1_data), 'r--', 'LineWidth',0.5);
     plot(X, y_learned_L1 - mean(epsilon_L1_data), 'r--', 'LineWidth',0.5);
@@ -230,28 +230,7 @@ for num_i = num
     grid on;
     hold off;
 
-    %  % プロットの作成
-    % figure;
-    % 
-    % % インデックスの生成
-    % index = 1:num_i;
-    % 
-    % % Y_originalのプロット
-    % plot(index, Y, 'o-', 'LineWidth', 1.5); 
-    % hold on; 
-    % % y_learned_L1のプロット
-    % plot(index, y_learned_L1, 'g-', 'LineWidth', 1.5);
-    % %ε帯の描写
-    % % εが0の場合、プロットの意味がなくなるので描写しないか、固定値を与える
-    % plot(index, y_learned_L1 + mean(epsilon_L1_data), 'r--', 'LineWidth',0.5);
-    % plot(index, y_learned_L1 - mean(epsilon_L1_data), 'r--', 'LineWidth',0.5);
-    % % プロットの装飾
-    % title('L1:元関数, 観測値, 予測値のグラフ, データ数：' + string(num_i));
-    % xlabel('インデックス');
-    % ylabel('当日の最高値');
-    % legend({'観測値', '予測値', 'ε帯'}, 'Location', 'Best');
-    % grid on;
-    % hold off;
+    
 
     % %L2の結果の表示
     % 

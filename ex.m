@@ -5,7 +5,7 @@ for num_i = num
     rng default;
 
     data = readmatrix('Concrete_Data.xls'); % コンクリートに関するデータ(1030個)
-    X = data(:, 1) ; % セメントの量, 水の量, 粗骨材の量, 細骨材の量
+    X = [data(:, 1),data(:,4)] ; % セメントの量, 水の量, 粗骨材の量, 細骨材の量
     Y = data(:, 9); % コンクリートの強度
 
     % SVRのハイパーパラメータの候補(色々試してこれ)
@@ -78,7 +78,7 @@ for num_i = num
                         % 訓練データを使って, 回帰モデル作成
                         try
                             disp("モデル作成開始L1:ハイパーパラメータ：ε="+string(e)+",C="+string(c)+",kernel="+string(k)+",内部"+string(j)+"回目、外部"+string(i)+"回目");
-                            mdl_L1SVR_Tuning = fitrsvm(X(train_idx), Y(train_idx), "BoxConstraint", c, "KernelFunction", "rbf", "KernelScale", k, "Epsilon", e);
+                            mdl_L1SVR_Tuning = fitrsvm(X(train_idx,:), Y(train_idx), "BoxConstraint", c, "KernelFunction", "rbf", "KernelScale", k, "Epsilon", e);
                             % disp("モデル作成終了")
                         catch ME
                             ME_flag = 1; % もし最適化プログラムが収束しなかった場合はME_flag=1にして, break
@@ -86,7 +86,7 @@ for num_i = num
                         end
     
                         % 検証用データで平均絶対値誤差を算出
-                        y_pred_Tuning_L1 = predict(mdl_L1SVR_Tuning, X(validate_idx));
+                        y_pred_Tuning_L1 = predict(mdl_L1SVR_Tuning, X(validate_idx,:));
                         absolute_error_L1 = absolute_error_L1 + mean(abs(y_pred_Tuning_L1 - Y(validate_idx)));
     
                     end
@@ -111,9 +111,9 @@ for num_i = num
     
         % 内側の交差検証でハイパーパラメータが決まったら, 外側の交差検証で予測精度を算出
         % 学習データ(訓練データ+検証データ)を使い, 内側の交差検証で求めたハイパーパラメータで回帰モデルを作成
-        mdl_L1SVR = fitrsvm(X(learn_idx), Y(learn_idx), "BoxConstraint", C_L1_opt, "KernelFunction", "rbf", "KernelScale", KernelScale_L1_opt, "Epsilon", Epsilon_L1_opt);
+        mdl_L1SVR = fitrsvm(X(learn_idx,:), Y(learn_idx), "BoxConstraint", C_L1_opt, "KernelFunction", "rbf", "KernelScale", KernelScale_L1_opt, "Epsilon", Epsilon_L1_opt);
         
-        y_pred_L1 = predict(mdl_L1SVR, X(test_idx));
+        y_pred_L1 = predict(mdl_L1SVR, X(test_idx,:));
 
         y_learned_L1(test_idx) = y_pred_L1;
         
@@ -121,7 +121,7 @@ for num_i = num
         C_L1_data(i) = C_L1_opt;
         KernelScale_L1_data(i) = KernelScale_L1_opt;
 
-        ratio_SV_L1(i) = size(mdl_L1SVR.SupportVectors,1)/(size(X(learn_idx),1));
+        ratio_SV_L1(i) = size(mdl_L1SVR.SupportVectors,1)/(size(X(learn_idx,:),1));
     end
     
 
@@ -214,19 +214,29 @@ for num_i = num
     % プロットの作成
     figure;
 
+    % メッシュグリッドの作成
+    [X1, X2] = meshgrid(linspace(min(X(:, 1)), max(X(:, 1)), 50), linspace(min(X(:, 2)), max(X(:, 2)), 50));
+    X_grid = [X1(:), X2(:)];
+    
+    % メッシュグリッド上での予測
+    y_grid_pred = predict(mdl_L1SVR, X_grid);
+    Y_grid = reshape(y_grid_pred, size(X1));
+
     % Y_originalのプロット
-    plot(X, Y, 'o', 'LineWidth', 1.5); 
+    scatter3(X(:,1),X(:,2),Y,"fiilled");
     hold on; 
-    % y_pred_L1のプロット
-    plot(X, y_learned_L1, 'g-', 'LineWidth', 1.5);
+    
+   % 予測値のプロット（曲面）
+    surf(X1, X2, Y_grid, 'FaceAlpha', 0.5, 'EdgeColor', 'none');
     %ε帯の描写
-    plot(X, y_learned_L1 + mean(epsilon_L1_data), 'r--', 'LineWidth',0.5);
-    plot(X, y_learned_L1 - mean(epsilon_L1_data), 'r--', 'LineWidth',0.5);
+    % plot(X, y_learned_L1 + mean(epsilon_L1_data), 'r--', 'LineWidth',0.5);
+    % plot(X, y_learned_L1 - mean(epsilon_L1_data), 'r--', 'LineWidth',0.5);
     % プロットの装飾
-    title('L1:元関数, 観測値, 予測値のグラフ,データ数：' + string(num_i));
-    xlabel('X');
-    ylabel('Y');
-    legend({'観測値', '予測値', 'ε帯'}, 'Location', 'Best');
+    title('L1:元関数, 観測値, 予測値のグラフ, データ数：' + string(num_i));
+    xlabel('セメントの量');
+    ylabel('水の量');
+    zlabel('コンクリートの強度');
+    legend({'観測値', '予測値'}, 'Location', 'Best');
     grid on;
     hold off;
 
