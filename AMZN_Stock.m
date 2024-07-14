@@ -1,10 +1,10 @@
 % 実データでの事例3 (AMZNの株価)
 
-data = readmatrix('AMZN_Stocks_5yr.csv'); % AMAZON社の5年間の株価(元のデータには複数の会社のデータが記載されてる)
+data = readmatrix('AMZN_data.csv'); % AMAZON社の5年間の株価(元のデータには複数の会社のデータが記載されてる)
 X = data(:, 3); % 前日の最高値
 Y = data(:, 4); % 当日の最高値
 
-num = 1258;
+num = 1159;
 
 % SVRのハイパーパラメータの候補
 epsilon = [0, 5, 10, 15, 20, 25, 30];
