@@ -1,6 +1,7 @@
-data = readmatrix('Concrete_Data.xls'); % AMAZON社の5年間の株価(元のデータには複数の会社のデータが記載されてる)
-X = data(:, 2); % 
-Y = data(:, 9); % 当日の最高値
+data = readmatrix('diamond_train.csv'); % AMAZON社の5年間の株価(元のデータには複数の会社のデータが記載されてる)
+data = data(1:1000,:);
+X = data(:, 7); % 
+Y = data(:, 8); % 当日の最高値
 
 % プロット
 figure;
