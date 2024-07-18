@@ -1,7 +1,12 @@
-data = readmatrix('diamond'); % AMAZON社の5年間の株価(元のデータには複数の会社のデータが記載されてる)
+data = readmatrix('Concrete_Data.xls'); % AMAZON社の5年間の株価(元のデータには複数の会社のデータが記載されてる)
 data = data(1:1000,:);
-X = data(:, 8); % 
-Y = data(:, 9); % 当日の最高値
+cement = data(:, );
+slag = data(:, );
+ash = data(:, );
+water = data(:, );
+superplasticizer = data(:, );
+aggregate = data(:, );
+
 
 % プロット
 figure;

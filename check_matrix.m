@@ -9,10 +9,16 @@ ca = data(:, 6);
 fa = data(:, 7);
 age = data(:, 8);
 
-% プロット
+% ラベルの設定
+variableNames = {'cement', 'slag', 'ash', 'water', 'superplasticizer', 'ca','fa','age'};
+
+matrix_data = [cement,slag,ash,water,superplasticizer,ca,fa,age];
+
+R = corrcoef(matrix_data);
+disp(R);
 figure;
-plot(X, Y, 'o');
-xlabel('前日の最高値');
-ylabel('強度');
-title('前日の最高値と当日の最高値の関係 (AMAZON社)');
-grid on;
+
+heatmap(variableNames,variableNames,R);
+
+
+title("heatmap");

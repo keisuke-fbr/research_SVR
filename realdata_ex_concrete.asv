@@ -4,12 +4,11 @@ num = [1030];
 for num_i = num
     rng default;
 
-    data = readmatrix('deta/Concrete_Data.xls'); % コンクリートに関するデータ(1030個)
+    data = readmatrix('Concrete_Data.xls'); % コンクリートに関するデータ(1030個)
     water = data(:,4);
     cement = data(:,1);
-    water_st = (water - mean(water)) ./ std(water);
-    cement_st = (cement - mean(cement)) ./ std(cement);
-    X = [water_st,cement_st] ; % セメントの量, 水の量
+    water_st = (water - mean(water)) ./ std()
+    X = [data(:, 1),data(:,4)] ; % セメントの量, 水の量
     Y = data(:, 9); % コンクリートの強度
 
     % SVRのハイパーパラメータの候補(色々試してこれ)
